@@ -1,7 +1,9 @@
-package br.unb.hugowschneider.FastaUtilities;
+package br.unb.hugowschneider.fastautilities;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
+import java.io.PrintWriter;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -12,8 +14,8 @@ import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
-import br.unb.hugowschneider.FastaUtilities.NucleotidePatternCounter.CountType;
-import br.unb.hugowschneider.FastaUtilities.NucleotidePatternCounter.OutputType;
+import br.unb.hugowschneider.fastautilities.NucleotidePatternCounter.CountType;
+import br.unb.hugowschneider.fastautilities.NucleotidePatternCounter.OutputType;
 
 /**
  * Hello world!
@@ -27,7 +29,8 @@ public class App {
 				.longOpt("fasta").required(true).build();
 		Option countOption = Option.builder("c").numberOfArgs(2).valueSeparator(',').argName("min,max")
 				.desc("Count nucleotide patterns of fasta seguence with minimum and maximum pattern sizes").build();
-		Option csvOption = Option.builder().desc("Output type CSV").longOpt("csv").build();
+		Option csvOption = Option.builder().desc("Output type CSV").longOpt("csv").numberOfArgs(1).argName("csv file")
+				.build();
 		Option helpOption = Option.builder("h").desc("Print this help").longOpt("help").build();
 
 		OptionGroup group = new OptionGroup();
@@ -57,13 +60,24 @@ public class App {
 					usage("File does not exists", options);
 					return;
 				}
+				File output = null;
+				if (cmd.hasOption("csv")) {
+					output = new File(cmd.getOptionValue("csv"));
+					if (output.exists()) {
+						usage("Output file already exists", options);
+						return;
+					}
+				}
+
 				String[] minMax = cmd.getOptionValues("c");
 				try {
 					Integer min = Integer.parseInt(minMax[0]);
 					Integer max = Integer.parseInt(minMax[1]);
 					NucleotidePatternCounter counter = new NucleotidePatternCounter(file, min, max);
-					counter.count(cmd.hasOption("a") ? CountType.AMINO_ACID : CountType.NUCLEOTIDE, OutputType.CSV,
-							System.out, cmd.hasOption("percent"));
+					PrintStream out = output != null ? new PrintStream(output) : System.out;
+					counter.count(cmd.hasOption("a") ? CountType.AMINO_ACID : CountType.NUCLEOTIDE, OutputType.CSV, out,
+							cmd.hasOption("percent"));
+					out.close();
 				} catch (NumberFormatException | java.text.ParseException | IOException e) {
 					e.printStackTrace();
 					usage(e.getMessage(), options);

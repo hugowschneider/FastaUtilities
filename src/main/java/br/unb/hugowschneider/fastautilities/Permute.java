@@ -1,4 +1,4 @@
-package br.unb.hugowschneider.FastaUtilities;
+package br.unb.hugowschneider.fastautilities;
 
 import java.util.Arrays;
 import java.util.List;
