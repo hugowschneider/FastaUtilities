@@ -22,8 +22,8 @@ public class NucleotidePatternCounter {
 	}
 
 	public enum CountType {
-		NUCLEOTIDE("ACGT"), AMINO_ACID("ABCDEFGHIJKLMNOPQRSTUVWYZX");
-//RYKMSWBDHVN
+		NUCLEOTIDE("ACGTRYKMSWBDHVN"), AMINO_ACID("ABCDEFGHIJKLMNOPQRSTUVWYZX");
+//
 		private String alphabet;
 
 		private CountType(String alphabet) {
@@ -96,7 +96,7 @@ public class NucleotidePatternCounter {
 				StringBuilder pattern = new StringBuilder();
 				while (randomAccessFile.length() > randomAccessFile.getFilePointer()) {
 
-					System.err.println(String.format("%1$.2f",
+					System.err.println(String.format("%1$.4f%%",
 							(double) randomAccessFile.getFilePointer() / (double) randomAccessFile.length()));
 					c = (char) randomAccessFile.read();
 					while (c == '\n' || c == '\r') {
@@ -129,7 +129,7 @@ public class NucleotidePatternCounter {
 				}
 				if (percent) {
 					for (Map.Entry<CharSequence, Integer> entry : count.entrySet()) {
-						totals.put(entry.getKey().length(), totals.get(entry.getKey().length()) + 1);
+						totals.put(entry.getKey().length(), totals.get(entry.getKey().length()) + entry.getValue());
 					}
 
 				}
@@ -138,7 +138,11 @@ public class NucleotidePatternCounter {
 						continue;
 					}
 					if (percent) {
-						record.add(((double) count.get(charSequence)) / totals.get(charSequence.length()));
+						Double r = ((double) count.get(charSequence)) / totals.get(charSequence.length());
+						if(r > 1){
+							System.out.println();
+						}
+						record.add(r);
 					} else {
 						record.add(count.get(charSequence));
 					}
