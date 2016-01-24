@@ -108,7 +108,7 @@ public class NucleotidePatternCounter {
 					if (c == '>') {
 						break;
 					}
-					pattern.append(c);
+					pattern.append(String.valueOf(c).toUpperCase());
 					if (pattern.length() == max) {
 						for (int i = min; i <= max; i++) {
 							Integer lastCount = count.get(pattern.subSequence(0, i));
