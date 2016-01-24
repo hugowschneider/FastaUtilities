@@ -52,7 +52,8 @@ public class NucleotidePatternCounter {
 		setMaxPatternSize(maxPatternSize);
 	}
 
-	public void count(CountType type, OutputType outputType, Appendable output) throws ParseException, IOException {
+	public void count(CountType type, OutputType outputType, Appendable output, boolean percent)
+			throws ParseException, IOException {
 		RandomAccessFile randomAccessFile = new RandomAccessFile(getInput(), "r");
 		try {
 			char c = (char) randomAccessFile.read();
@@ -119,11 +120,25 @@ public class NucleotidePatternCounter {
 
 				List<Object> record = new ArrayList<>();
 				record.add(sequenceName);
+				Map<Integer, Double> totals = new HashMap<>();
+				for (int i = min; i <= max; i++) {
+					totals.put(i, 0.0);
+				}
+				if (percent) {
+					for (Map.Entry<CharSequence, Integer> entry : count.entrySet()) {
+						totals.put(entry.getKey().length(), totals.get(entry.getKey().length()) + 1);
+					}
+
+				}
 				for (CharSequence charSequence : headers) {
 					if (charSequence.equals("Sequence")) {
 						continue;
 					}
-					record.add(count.get(charSequence));
+					if (percent) {
+						record.add(((double) count.get(charSequence)) / totals.get(charSequence.length()));
+					} else {
+						record.add(count.get(charSequence));
+					}
 				}
 				csvPrinter.printRecord(record);
 			}

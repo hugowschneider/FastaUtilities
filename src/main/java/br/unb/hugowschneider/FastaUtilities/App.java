@@ -35,11 +35,16 @@ public class App {
 		group.addOption(Option.builder("n").desc("Nucleotide fasta file").build());
 		group.addOption(Option.builder("a").desc("Amino acids fasta file").build());
 
+		OptionGroup groupCount = new OptionGroup();
+		groupCount.addOption(Option.builder().desc("Nucleotide fasta file").longOpt("percent").build());
+		groupCount.addOption(Option.builder().desc("Amino acids fasta file").longOpt("abs").build());
+
 		options.addOption(fastaOption);
 		options.addOption(countOption);
 		options.addOption(csvOption);
 		options.addOption(helpOption);
 		options.addOptionGroup(group);
+		options.addOptionGroup(groupCount);
 
 		CommandLineParser parser = new DefaultParser();
 		try {
@@ -58,7 +63,7 @@ public class App {
 					Integer max = Integer.parseInt(minMax[1]);
 					NucleotidePatternCounter counter = new NucleotidePatternCounter(file, min, max);
 					counter.count(cmd.hasOption("a") ? CountType.AMINO_ACID : CountType.NUCLEOTIDE, OutputType.CSV,
-							System.out);
+							System.out, cmd.hasOption("percent"));
 				} catch (NumberFormatException | java.text.ParseException | IOException e) {
 					e.printStackTrace();
 					usage(e.getMessage(), options);
