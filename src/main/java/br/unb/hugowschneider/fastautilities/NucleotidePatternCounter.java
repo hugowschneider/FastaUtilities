@@ -22,8 +22,8 @@ public class NucleotidePatternCounter {
 	}
 
 	public enum CountType {
-		NUCLEOTIDE("ACGTRYKMSWBDHVN"), AMINO_ACID("ABCDEFGHIJKLMNOPQRSTUVWYZX");
-
+		NUCLEOTIDE("ACGT"), AMINO_ACID("ABCDEFGHIJKLMNOPQRSTUVWYZX");
+//RYKMSWBDHVN
 		private String alphabet;
 
 		private CountType(String alphabet) {
@@ -95,6 +95,9 @@ public class NucleotidePatternCounter {
 				}
 				StringBuilder pattern = new StringBuilder();
 				while (randomAccessFile.length() > randomAccessFile.getFilePointer()) {
+
+					System.err.println(String.format("%1$.2f",
+							(double) randomAccessFile.getFilePointer() / (double) randomAccessFile.length()));
 					c = (char) randomAccessFile.read();
 					while (c == '\n' || c == '\r') {
 						c = (char) randomAccessFile.read();
