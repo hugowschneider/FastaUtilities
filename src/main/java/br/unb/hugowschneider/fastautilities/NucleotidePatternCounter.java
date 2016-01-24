@@ -23,7 +23,7 @@ public class NucleotidePatternCounter {
 
 	public enum CountType {
 		NUCLEOTIDE("ACGTRYKMSWBDHVN"), AMINO_ACID("ABCDEFGHIJKLMNOPQRSTUVWYZX");
-//
+		//
 		private String alphabet;
 
 		private CountType(String alphabet) {
@@ -82,7 +82,7 @@ public class NucleotidePatternCounter {
 			});
 			headers.insertElementAt("Sequence", 0);
 			CSVPrinter csvPrinter = CSVFormat.DEFAULT.withHeader(headers.toArray(new String[0])).print(output);
-
+			double last = 0;
 			while (randomAccessFile.length() > randomAccessFile.getFilePointer()) {
 				String sequenceName = randomAccessFile.readLine();
 				if (sequenceName.startsWith(">")) {
@@ -95,9 +95,12 @@ public class NucleotidePatternCounter {
 				}
 				StringBuilder pattern = new StringBuilder();
 				while (randomAccessFile.length() > randomAccessFile.getFilePointer()) {
-
-					System.err.println(String.format("%1$.4f%%",
-							(double) randomAccessFile.getFilePointer() / (double) randomAccessFile.length()));
+					double current = (double) randomAccessFile.getFilePointer() * 100.0
+							/ (double) randomAccessFile.length();
+					if (current - last > 0.5) {
+						System.err.println(String.format("%1$.4f%%", current));
+						last = current;
+					}
 					c = (char) randomAccessFile.read();
 					while (c == '\n' || c == '\r') {
 						c = (char) randomAccessFile.read();
@@ -108,7 +111,14 @@ public class NucleotidePatternCounter {
 					pattern.append(c);
 					if (pattern.length() == max) {
 						for (int i = min; i <= max; i++) {
-							count.put(pattern.subSequence(0, i), count.get(pattern.subSequence(0, i)) + 1);
+							Integer lastCount = count.get(pattern.subSequence(0, i));
+							if (lastCount != null) {
+								count.put(pattern.subSequence(0, i), lastCount + 1);
+							} else {
+								System.err.println(
+										String.format("Unrecognized pattern: %1$s", pattern.subSequence(0, i)));
+							}
+
 						}
 						pattern.replace(0, 1, "");
 					}
@@ -116,7 +126,12 @@ public class NucleotidePatternCounter {
 				}
 				while (pattern.length() > 0) {
 					for (int i = min; i <= pattern.length(); i++) {
-						count.put(pattern.subSequence(0, i), count.get(pattern.subSequence(0, i)) + 1);
+						Integer lastCount = count.get(pattern.subSequence(0, i));
+						if (lastCount != null) {
+							count.put(pattern.subSequence(0, i), lastCount + 1);
+						} else {
+							System.err.println(String.format("Unrecognized pattern: %1$s", pattern.subSequence(0, i)));
+						}
 					}
 					pattern.replace(0, 1, "");
 				}
@@ -139,7 +154,7 @@ public class NucleotidePatternCounter {
 					}
 					if (percent) {
 						Double r = ((double) count.get(charSequence)) / totals.get(charSequence.length());
-						if(r > 1){
+						if (r > 1) {
 							System.out.println();
 						}
 						record.add(r);
