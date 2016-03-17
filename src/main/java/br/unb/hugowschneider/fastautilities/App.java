@@ -89,6 +89,7 @@ public class App {
 				finder.find(OutputType.CSV, out);
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 			usage(e.getMessage(), options);
 		}
 
