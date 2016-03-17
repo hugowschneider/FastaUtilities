@@ -35,6 +35,8 @@ public class App {
 
 		OptionGroup group = new OptionGroup();
 		group.setRequired(true);
+		group.addOption(Option.builder("nn").desc("Nucleotide fasta file and compute nucleodite wildcards such as N, B")
+				.build());
 		group.addOption(Option.builder("n").desc("Nucleotide fasta file").build());
 		group.addOption(Option.builder("a").desc("Amino acids fasta file").build());
 
@@ -75,8 +77,10 @@ public class App {
 					Integer max = Integer.parseInt(minMax[1]);
 					NucleotidePatternCounter counter = new NucleotidePatternCounter(file, min, max);
 					PrintStream out = output != null ? new PrintStream(output) : System.out;
-					counter.count(cmd.hasOption("a") ? CountType.AMINO_ACID : CountType.NUCLEOTIDE, OutputType.CSV, out,
-							cmd.hasOption("percent"));
+					counter.count(
+							cmd.hasOption("a") ? CountType.AMINO_ACID
+									: (cmd.hasOption("nn") ? CountType.NUCLEOTIDE_ALL : CountType.NUCLEOTIDE),
+							OutputType.CSV, out, cmd.hasOption("percent"));
 					out.close();
 				} catch (NumberFormatException | java.text.ParseException | IOException e) {
 					e.printStackTrace();

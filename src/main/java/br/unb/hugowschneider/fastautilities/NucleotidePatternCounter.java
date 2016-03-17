@@ -14,6 +14,7 @@ import java.util.Vector;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.csv.QuoteMode;
 
 public class NucleotidePatternCounter {
 
@@ -22,7 +23,7 @@ public class NucleotidePatternCounter {
 	}
 
 	public enum CountType {
-		NUCLEOTIDE("ACGTRYKMSWBDHVN"), AMINO_ACID("ABCDEFGHIJKLMNOPQRSTUVWYZX");
+		NUCLEOTIDE("ACGT"), NUCLEOTIDE_ALL("ACGTRYKMSWBDHVN"), AMINO_ACID("ABCDEFGHIJKLMNOPQRSTUVWYZX");
 		//
 		private String alphabet;
 
@@ -81,11 +82,16 @@ public class NucleotidePatternCounter {
 				}
 			});
 			headers.insertElementAt("Sequence", 0);
-			CSVPrinter csvPrinter = CSVFormat.DEFAULT.withHeader(headers.toArray(new String[0])).print(output);
+			headers.insertElementAt("Size", 0);
+			headers.insertElementAt("Sequence Id", 0);
+			CSVPrinter csvPrinter = CSVFormat.DEFAULT.withHeader(headers.toArray(new String[0])).withQuote('"')
+					.withQuoteMode(QuoteMode.NON_NUMERIC).print(output);
 			double last = 0;
+			int size = 0;
 			while (randomAccessFile.length() > randomAccessFile.getFilePointer()) {
 				String sequenceName = randomAccessFile.readLine();
 				if (sequenceName.startsWith(">")) {
+					size = 0;
 					sequenceName = sequenceName.substring(1);
 				}
 				sequenceName = sequenceName.trim();
@@ -94,6 +100,7 @@ public class NucleotidePatternCounter {
 					count.putAll(type.createCountMap(i));
 				}
 				StringBuilder pattern = new StringBuilder();
+				StringBuilder sequence = new StringBuilder();
 				while (randomAccessFile.length() > randomAccessFile.getFilePointer()) {
 					double current = (double) randomAccessFile.getFilePointer() * 100.0
 							/ (double) randomAccessFile.length();
@@ -106,8 +113,11 @@ public class NucleotidePatternCounter {
 						c = (char) randomAccessFile.read();
 					}
 					if (c == '>') {
+						size = 0;
 						break;
 					}
+					size++;
+					sequence.append(String.valueOf(c));
 					pattern.append(String.valueOf(c).toUpperCase());
 					if (pattern.length() == max) {
 						for (int i = min; i <= max; i++) {
@@ -138,6 +148,8 @@ public class NucleotidePatternCounter {
 
 				List<Object> record = new ArrayList<>();
 				record.add(sequenceName);
+				record.add(size);
+				record.add(sequence);
 				Map<Integer, Double> totals = new HashMap<>();
 				for (int i = min; i <= max; i++) {
 					totals.put(i, 0.0);
@@ -149,7 +161,8 @@ public class NucleotidePatternCounter {
 
 				}
 				for (CharSequence charSequence : headers) {
-					if (charSequence.equals("Sequence")) {
+					if (charSequence.equals("Sequence") || charSequence.equals("Size")
+							|| charSequence.equals("Sequence Id")) {
 						continue;
 					}
 					if (percent) {
