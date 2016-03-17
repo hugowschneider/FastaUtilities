@@ -112,7 +112,7 @@ public class NucleotidePatternCounter {
 					while (c == '\n' || c == '\r') {
 						c = (char) randomAccessFile.read();
 					}
-					if (c == '>' || c == -1) {
+					if (c == '>' || c == -1 || c == '\uFFFF') {
 						break;
 					}
 					size++;
