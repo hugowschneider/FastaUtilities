@@ -18,10 +18,6 @@ import org.apache.commons.csv.QuoteMode;
 
 public class NucleotidePatternCounter {
 
-	public enum OutputType {
-		CSV
-	}
-
 	public enum CountType {
 		NUCLEOTIDE("ACGT"), NUCLEOTIDE_ALL("ACGTRYKMSWBDHVN"), AMINO_ACID("ABCDEFGHIJKLMNOPQRSTUVWYZX");
 		//
