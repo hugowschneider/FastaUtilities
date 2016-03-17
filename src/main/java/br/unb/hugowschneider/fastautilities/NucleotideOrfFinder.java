@@ -98,26 +98,34 @@ public class NucleotideOrfFinder {
 					orf = new StringBuilder();
 					i = sequence.indexOf("ATG", i + 1);
 				}
+				if (!orfs.isEmpty()) {
 
-				Integer index = Collections.min(orfs.keySet());
-				String orfSeq = orfs.get(index);
+					Integer index = Collections.min(orfs.keySet());
+					String orfSeq = orfs.get(index);
 
-				record.add(orfSeq);
-				record.add(index);
-				record.add(orfSeq.length() + index);
+					record.add(orfSeq);
+					record.add(index);
+					record.add(orfSeq.length() + index);
 
-				Map.Entry<Integer, String> max = Collections.max(orfs.entrySet(),
-						new Comparator<Map.Entry<Integer, String>>() {
-							@Override
-							public int compare(Map.Entry<Integer, String> o1, Map.Entry<Integer, String> o2) {
-								return o1.getValue().length() - o2.getValue().length();
-							}
-						});
+					Map.Entry<Integer, String> max = Collections.max(orfs.entrySet(),
+							new Comparator<Map.Entry<Integer, String>>() {
+								@Override
+								public int compare(Map.Entry<Integer, String> o1, Map.Entry<Integer, String> o2) {
+									return o1.getValue().length() - o2.getValue().length();
+								}
+							});
 
-				record.add(max.getValue());
-				record.add(max.getKey());
-				record.add(max.getValue().length() + max.getKey());
-
+					record.add(max.getValue());
+					record.add(max.getKey());
+					record.add(max.getValue().length() + max.getKey());
+				} else {
+					record.add("");
+					record.add("");
+					record.add("");
+					record.add("");
+					record.add("");
+					record.add("");
+				}
 				csvPrinter.printRecord(record);
 			}
 		} finally {
