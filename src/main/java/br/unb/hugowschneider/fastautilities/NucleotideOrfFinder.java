@@ -94,7 +94,10 @@ public class NucleotideOrfFinder {
 						}
 						orf.append(codon);
 					}
-					orfs.put(i, orf.toString());
+					if (orf.toString().endsWith("TAA") || orf.toString().endsWith("TAG")
+							|| orf.toString().endsWith("TGA")) {
+						orfs.put(i, orf.toString());
+					}
 					orf = new StringBuilder();
 					i = sequence.indexOf("ATG", i + 1);
 				}
