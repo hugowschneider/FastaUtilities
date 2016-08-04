@@ -63,11 +63,7 @@ public class App {
 			}
 			File output = null;
 			if (cmd.hasOption("csv")) {
-				output = new File(cmd.getOptionValue("csv"));
-				if (output.exists()) {
-					usage("Output file already exists", options);
-					return;
-				}
+				output = new File(cmd.getOptionValue("csv"));				
 			}
 			PrintStream out = output != null ? new PrintStream(output) : System.out;
 
